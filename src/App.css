@@ -1,15 +1,16 @@
 :root {
   --primary-color: #98c93c;
-  --secondary-color: #ffeA75;
+  --secondary-color: #fffcd9;
   --primary-dark: #6ea32c;
-  --background-color: #ffffff;
+  --background-color: #fffcd9;
   --text-color: #000000;
+  --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
 
 /* Переопределение цветов для темной темы */
 .dark-mode {
   --primary-color: #98c93c;
-  --secondary-color: #ffeA75;
+  --secondary-color: #fffcd9;
   --primary-dark: #81b734;
   --background-color: var(--tg-bg-color, #1c1c1e);
   --text-color: var(--tg-text-color, #ffffff);
@@ -19,7 +20,9 @@
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: sans-serif;
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 .app {
@@ -31,31 +34,44 @@
   color: var(--text-color);
 }
 
+/* Стартовый экран */
 .start-screen {
   width: 100%;
   height: 100%;
-  display: flex;
-  flex-direction: column;
-  padding: 20px;
-  position: relative;
-}
-
-.background-waves {
   position: absolute;
   top: 0;
-  right: 0;
-  width: 100%;
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 80px 25px 40px;
+  animation: fadeIn 0.3s ease-in-out forwards;
+  background: linear-gradient(150deg, var(--secondary-color) 0%, #e9f0c0 100%);
+  overflow: hidden;
+}
+
+.start-screen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -10%;
+  width: 120%;
   height: 100%;
-  background: linear-gradient(120deg, 
-    transparent 0%, 
-    transparent 40%, 
-    rgba(198, 216, 94, 0.3) 40%, 
-    rgba(198, 216, 94, 0.3) 60%, 
-    rgba(255, 234, 117, 0.3) 60%, 
-    rgba(255, 234, 117, 0.3) 100%);
-  z-index: -1;
-  transform: rotate(-20deg) scale(1.5) translateY(-10%);
-  border-radius: 50% 50% 0 0;
+  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2398c93c" fill-opacity="0.2" d="M0,224L80,224C160,224,320,224,480,197.3C640,171,800,117,960,117.3C1120,117,1280,171,1360,197.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>') no-repeat bottom center;
+  background-size: cover;
+  z-index: 0;
+  opacity: 0.7;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .content {
@@ -63,14 +79,17 @@
   flex-direction: column;
   justify-content: space-between;
   height: 100%;
-  padding-top: 40%;
+  position: relative;
+  z-index: 1;
+  padding-top: 10vh;
 }
 
 .title {
-  font-size: 2.5rem;
-  line-height: 1.2;
-  margin-bottom: 20px;
-  padding: 0 20px;
+  font-size: 48px;
+  line-height: 1.1;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: 40px;
 }
 
 .black-text {
@@ -80,37 +99,15 @@
 
 .green-text {
   color: var(--primary-color);
-  font-weight: normal;
+  font-weight: 600;
+  display: inline-block;
 }
 
 .button-container {
   width: 100%;
-  padding: 0 20px;
-}
-
-.start-button {
-  background-color: #98c93c;
-  color: white;
-  border: none;
-  border-radius: 50px;
-  padding: 15px 30px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-  margin-bottom: 40px;
-  cursor: pointer;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.start-text {
-  font-size: 1.1rem;
-  font-weight: bold;
-  margin-right: auto;
-}
-
-.arrow-icon {
-  font-size: 1.2rem;
+  padding: 0 0;
+  margin-top: auto;
+  margin-bottom: 30px;
 }
 
 /* Стили для слайдера */
@@ -122,12 +119,19 @@
   border-radius: 28px;
   margin-bottom: 40px;
   overflow: visible;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 12px rgba(152, 201, 60, 0.3);
   cursor: pointer;
   will-change: contents;
   touch-action: none;
-  padding-bottom: 25px;
+  padding-bottom: 0;
   transition: transform 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.slider-track::before {
+  display: none;
 }
 
 .slider-progress {
@@ -145,17 +149,18 @@
 
 .slider-thumb {
   position: absolute;
-  top: 0;
+  top: 50%;
   left: 0;
   width: 56px;
   height: 56px;
+  transform: translateY(-50%);
   background-color: var(--primary-dark);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
-  z-index: 2; /* Увеличиваем z-index чтобы быть поверх прогресса */
+  z-index: 2;
   transition: background-color 0.2s, box-shadow 0.2s;
   will-change: transform, left;
   touch-action: none;
@@ -167,166 +172,65 @@
 }
 
 .slider-thumb.dragging {
-  transition: background-color 0.2s, box-shadow 0.2s;
   box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.6);
   background-color: #5c8c24;
-}
-
-.slider-track::before {
-  content: '';
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: 100%;
-  width: 0;
-  background-color: rgba(255, 255, 255, 0.1);
-  z-index: 0;
-  transition: width 0.2s;
-}
-
-.slider-thumb.dragging + .slider-text + .slider-arrows {
-  animation: none;
-}
-
-.slider-text {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
-  font-size: 1.1rem;
-  font-weight: bold;
-  pointer-events: none;
-}
-
-.slider-arrows {
-  position: absolute;
-  right: 25px;
-  top: 0;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  color: white;
-  font-size: 1.2rem;
-  pointer-events: none;
-  animation: pulse 1.5s infinite;
-}
-
-@keyframes pulse {
-  0% {
-    opacity: 0.5;
-    transform: translateX(-5px);
-  }
-  50% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-  100% {
-    opacity: 0.5;
-    transform: translateX(-5px);
-  }
-}
-
-.arrow-icon {
-  color: white;
-  font-size: 1.5rem;
-  line-height: 1;
 }
 
 /* Когда пользователь начинает перетаскивание, показываем подсказку */
 .slider-track:active .slider-text::after,
 .slider-track.dragging .slider-text::after {
-  content: 'Проведите до конца';
-  position: absolute;
-  bottom: -20px;
-  left: 0;
-  width: 100%;
-  text-align: center;
-  font-size: 0.8rem;
-  opacity: 0.9;
-  color: rgba(255, 255, 255, 0.7);
-  font-weight: normal;
-  animation: fadeIn 0.3s ease-in;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 0.9; }
+  display: none; /* Убираем подсказку */
 }
 
 /* Добавляем анимированную пульсацию, чтобы привлечь внимание к слайдеру */
 .slider-track:not(:active):not(.dragging)::after {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  border-radius: 28px;
-  box-shadow: 0 0 0 4px rgba(152, 201, 60, 0.3);
-  animation: pulseShadow 1.5s infinite;
-  pointer-events: none;
-}
-
-@keyframes pulseShadow {
-  0% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
-  50% {
-    opacity: 1;
-    transform: scale(1.02);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(0.95);
-  }
+  display: none; /* Убираем пульсацию */
 }
 
 .slider-track:active {
-  transform: scale(0.99); /* Небольшой эффект нажатия */
+  transform: none; /* Убираем эффект нажатия */
 }
 
-/* Эффект завершения, когда слайдер дошел до конца */
-.slider-track.completed {
-  animation: complete 0.3s ease-out;
+/* Упрощенный стиль для стрелок в кнопке */
+.slider-arrows {
+  position: absolute;
+  right: 25px;
+  top: 50%;
+  transform: translateY(-50%); /* Центрируем вертикально */
+  display: flex;
+  align-items: center;
+  color: white;
+  font-size: 1.2rem;
+  pointer-events: none;
+  animation: none; /* Убираем анимацию */
+  letter-spacing: -1px;
 }
 
-@keyframes complete {
-  0% {
-    transform: scale(1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    transform: scale(1.03);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-  100% {
-    transform: scale(1);
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  }
+/* Улучшенный стиль для текста в кнопке */
+.slider-text {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%); /* Центрируем вертикально */
+  width: 100%;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 18px;
+  font-weight: 600;
+  pointer-events: none;
 }
 
 /* Медиа-запросы для адаптивности */
 @media (max-width: 480px) {
   .content {
-    padding-top: 30%;
+    padding-top: 15vh;
   }
   
   .title {
-    font-size: 2.2rem;
-  }
-  
-  .start-button {
-    padding: 12px 20px;
-  }
-  
-  .start-text {
-    font-size: 1rem;
+    font-size: 42px;
   }
   
   .slider-track {
@@ -336,7 +240,7 @@
   .slider-thumb {
     width: 50px;
     height: 50px;
-    transition: none; /* Отключаем анимацию для лучшего отклика */
+    transition: none;
   }
   
   .slider-thumb::before {
@@ -352,11 +256,11 @@
   }
   
   .slider-progress {
-    transition: none; /* Отключаем анимацию для лучшего отклика */
+    transition: none;
   }
   
   .slider-text {
-    font-size: 1rem;
+    font-size: 16px;
   }
   
   /* Удаляем анимацию пульсации на маленьких экранах для повышения производительности */
@@ -369,6 +273,17 @@
 @media (min-width: 768px) {
   .button-container {
     max-width: 500px;
-    margin: 0 auto;
+    margin: auto auto 40px;
   }
+  
+  .title {
+    font-size: 56px;
+    max-width: 700px;
+  }
+}
+
+.arrow-icon {
+  color: white;
+  font-size: 22px;
+  line-height: 1;
 }

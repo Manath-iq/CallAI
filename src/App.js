@@ -1,16 +1,32 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import telegram, { initTelegramWebApp, isTelegramWebAppAvailable } from './utils/telegramWebApp';
+import GenderScreen from './components/GenderScreen';
+
+// Экраны приложения
+const SCREENS = {
+  START: 'start',
+  GENDER: 'gender'
+};
 
 function App() {
+  // Состояние для отслеживания текущего экрана
+  const [currentScreen, setCurrentScreen] = useState(SCREENS.START);
+  
+  // Состояние для данных профиля пользователя
+  const [userProfile, setUserProfile] = useState({
+    gender: null
+  });
+
+  // Состояния для слайдера
   const [started, setStarted] = useState(false);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [isTelegramAvailable, setIsTelegramAvailable] = useState(false);
   const [progressWidth, setProgressWidth] = useState('0%');
+  const [isTelegramAvailable, setIsTelegramAvailable] = useState(false);
   const sliderRef = useRef(null);
   const trackRef = useRef(null);
-
+  
   // Инициализация Telegram Web App при загрузке компонента
   useEffect(() => {
     const telegramAvailable = isTelegramWebAppAvailable();
@@ -66,20 +82,33 @@ function App() {
     }
   }, [sliderPosition]);
 
+  // Обработчик клика на кнопку "Давай начнем"
   const handleStart = () => {
     if (started) return; // Предотвращаем повторный запуск
     
     setStarted(true);
     console.log('Приложение запущено!');
     
+    // Переходим к экрану выбора пола
+    setTimeout(() => {
+      setCurrentScreen(SCREENS.GENDER);
+    }, 500);
+    
     // Можно отправить данные в Telegram Bot при нажатии кнопки
     if (isTelegramAvailable && telegram.isExpanded) {
       // Опционально: отправляем данные в вызывающее приложение/бота
       // telegram.sendData(JSON.stringify({ action: 'start' }));
-      
-      // Или закрываем приложение после действия
-      // telegram.close();
     }
+  };
+
+  // Обработчик для экрана выбора пола
+  const handleGenderSelect = (gender) => {
+    setUserProfile(prev => ({
+      ...prev,
+      gender
+    }));
+    // Здесь будет переход к следующему экрану
+    console.log(`Выбран пол: ${gender}`);
   };
 
   const handleTouchStart = (e) => {
@@ -135,26 +164,6 @@ function App() {
     }
   };
 
-  const handleMouseDown = (e) => {
-    e.stopPropagation(); // Предотвращаем всплытие к обработчику трека
-    setIsDragging(true);
-    setStarted(false);
-    
-    // Добавляем класс dragging для трека при активации ползунка
-    if (trackRef.current) {
-      trackRef.current.classList.add('dragging');
-    }
-    
-    document.addEventListener('mousemove', handleTouchMove);
-    document.addEventListener('mouseup', handleMouseUp);
-  };
-
-  const handleMouseUp = () => {
-    handleTouchEnd(); // Используем ту же логику, что и для touch событий
-    document.removeEventListener('mousemove', handleTouchMove);
-    document.removeEventListener('mouseup', handleMouseUp);
-  };
-
   const handleTrackTouchStart = (e) => {
     if (!trackRef.current || !sliderRef.current) return;
 
@@ -189,43 +198,78 @@ function App() {
     }
   };
 
-  return (
-    <div className="app">
-      <div className="start-screen">
-        <div className="background-waves"></div>
-        <div className="content">
-          <h1 className="title">
-            <span className="black-text">Построй</span>
-            <br />
-            <span className="green-text">правильное</span>
-            <br />
-            <span className="black-text">питание</span>
-          </h1>
-          <div className="button-container">
-            <div 
-              className="slider-track" 
-              ref={trackRef}
-              onTouchStart={handleTrackTouchStart}
-              onMouseDown={handleTrackTouchStart}
-              onTouchMove={handleTouchMove}
-              onTouchEnd={handleTouchEnd}
-            >
-              <div className="slider-progress" style={{ width: progressWidth }}></div>
-              <div 
-                className={`slider-thumb ${isDragging ? 'dragging' : ''}`}
-                ref={sliderRef}
-                style={{ left: `${sliderPosition}px` }}
-                onTouchStart={handleTouchStart}
-                onMouseDown={handleMouseDown}
-              >
-                <span className="arrow-icon">›</span>
+  const handleMouseDown = (e) => {
+    e.stopPropagation(); // Предотвращаем всплытие к обработчику трека
+    setIsDragging(true);
+    setStarted(false);
+    
+    // Добавляем класс dragging для трека при активации ползунка
+    if (trackRef.current) {
+      trackRef.current.classList.add('dragging');
+    }
+    
+    document.addEventListener('mousemove', handleTouchMove);
+    document.addEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleMouseUp = () => {
+    handleTouchEnd(); // Используем ту же логику, что и для touch событий
+    document.removeEventListener('mousemove', handleTouchMove);
+    document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  // Рендеринг текущего экрана
+  const renderCurrentScreen = () => {
+    switch (currentScreen) {
+      case SCREENS.START:
+        return (
+          <div className="start-screen">
+            <div className="content">
+              <h1 className="title">
+                <span className="black-text">Построй</span>
+                <br />
+                <span className="green-text">правильное</span>
+                <br />
+                <span className="black-text">питание</span>
+              </h1>
+              <div className="button-container">
+                <div 
+                  className="slider-track" 
+                  ref={trackRef}
+                  onTouchStart={handleTrackTouchStart}
+                  onMouseDown={handleTrackTouchStart}
+                  onTouchMove={handleTouchMove}
+                  onTouchEnd={handleTouchEnd}
+                >
+                  <div className="slider-progress" style={{ width: progressWidth }}></div>
+                  <div 
+                    className={`slider-thumb ${isDragging ? 'dragging' : ''}`}
+                    ref={sliderRef}
+                    style={{ left: `${sliderPosition}px` }}
+                    onTouchStart={handleTouchStart}
+                    onMouseDown={handleMouseDown}
+                  >
+                    <span className="arrow-icon">›</span>
+                  </div>
+                  <div className="slider-text">Давай начнем</div>
+                  <div className="slider-arrows">›››</div>
+                </div>
               </div>
-              <div className="slider-text">Давай начнем</div>
-              <div className="slider-arrows">›››</div>
             </div>
           </div>
-        </div>
-      </div>
+        );
+      
+      case SCREENS.GENDER:
+        return <GenderScreen onNext={handleGenderSelect} />;
+      
+      default:
+        return <div>Неизвестный экран</div>;
+    }
+  };
+
+  return (
+    <div className="app">
+      {renderCurrentScreen()}
     </div>
   );
 }
