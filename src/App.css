@@ -1,3 +1,20 @@
+:root {
+  --primary-color: #98c93c;
+  --secondary-color: #ffeA75;
+  --primary-dark: #6ea32c;
+  --background-color: #ffffff;
+  --text-color: #000000;
+}
+
+/* Переопределение цветов для темной темы */
+.dark-mode {
+  --primary-color: #98c93c;
+  --secondary-color: #ffeA75;
+  --primary-dark: #81b734;
+  --background-color: var(--tg-bg-color, #1c1c1e);
+  --text-color: var(--tg-text-color, #ffffff);
+}
+
 * {
   margin: 0;
   padding: 0;
@@ -10,6 +27,8 @@
   height: 100vh;
   position: relative;
   overflow: hidden;
+  background-color: var(--background-color);
+  color: var(--text-color);
 }
 
 .start-screen {
@@ -55,12 +74,12 @@
 }
 
 .black-text {
-  color: #000;
+  color: var(--text-color);
   font-weight: bold;
 }
 
 .green-text {
-  color: #98c93c;
+  color: var(--primary-color);
   font-weight: normal;
 }
 
@@ -99,12 +118,29 @@
   position: relative;
   width: 100%;
   height: 56px;
-  background-color: #98c93c;
+  background-color: var(--primary-color);
   border-radius: 28px;
   margin-bottom: 40px;
-  overflow: hidden;
+  overflow: visible;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
   cursor: pointer;
+  will-change: contents;
+  touch-action: none;
+  padding-bottom: 25px;
+  transition: transform 0.2s;
+}
+
+.slider-progress {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 0; /* Ширина будет управляться через инлайн-стили */
+  background-color: rgba(255, 255, 255, 0.2);
+  z-index: 0;
+  transition: width 0.1s linear;
+  border-radius: 28px;
+  pointer-events: none;
 }
 
 .slider-thumb {
@@ -113,14 +149,15 @@
   left: 0;
   width: 56px;
   height: 56px;
-  background-color: #6ea32c;
+  background-color: var(--primary-dark);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: grab;
-  z-index: 1;
-  transition: background-color 0.2s, left 0.3s ease;
+  z-index: 2; /* Увеличиваем z-index чтобы быть поверх прогресса */
+  transition: background-color 0.2s, box-shadow 0.2s;
+  will-change: transform, left;
   touch-action: none;
 }
 
@@ -130,8 +167,25 @@
 }
 
 .slider-thumb.dragging {
-  box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.5);
+  transition: background-color 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.6);
   background-color: #5c8c24;
+}
+
+.slider-track::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  z-index: 0;
+  transition: width 0.2s;
+}
+
+.slider-thumb.dragging + .slider-text + .slider-arrows {
+  animation: none;
 }
 
 .slider-text {
@@ -183,6 +237,80 @@
   line-height: 1;
 }
 
+/* Когда пользователь начинает перетаскивание, показываем подсказку */
+.slider-track:active .slider-text::after,
+.slider-track.dragging .slider-text::after {
+  content: 'Проведите до конца';
+  position: absolute;
+  bottom: -20px;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  font-size: 0.8rem;
+  opacity: 0.9;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: normal;
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 0.9; }
+}
+
+/* Добавляем анимированную пульсацию, чтобы привлечь внимание к слайдеру */
+.slider-track:not(:active):not(.dragging)::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 28px;
+  box-shadow: 0 0 0 4px rgba(152, 201, 60, 0.3);
+  animation: pulseShadow 1.5s infinite;
+  pointer-events: none;
+}
+
+@keyframes pulseShadow {
+  0% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+}
+
+.slider-track:active {
+  transform: scale(0.99); /* Небольшой эффект нажатия */
+}
+
+/* Эффект завершения, когда слайдер дошел до конца */
+.slider-track.completed {
+  animation: complete 0.3s ease-out;
+}
+
+@keyframes complete {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+  50% {
+    transform: scale(1.03);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+}
+
 /* Медиа-запросы для адаптивности */
 @media (max-width: 480px) {
   .content {
@@ -208,10 +336,33 @@
   .slider-thumb {
     width: 50px;
     height: 50px;
+    transition: none; /* Отключаем анимацию для лучшего отклика */
+  }
+  
+  .slider-thumb::before {
+    content: '';
+    position: absolute;
+    width: 70px;
+    height: 70px;
+    background-color: transparent;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  .slider-progress {
+    transition: none; /* Отключаем анимацию для лучшего отклика */
   }
   
   .slider-text {
     font-size: 1rem;
+  }
+  
+  /* Удаляем анимацию пульсации на маленьких экранах для повышения производительности */
+  .slider-track:not(:active):not(.dragging)::after {
+    animation: none;
+    opacity: 0.3;
   }
 }
 

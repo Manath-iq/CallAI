@@ -1,28 +1,106 @@
 import { useState, useRef, useEffect } from 'react';
 import './App.css';
+import telegram, { initTelegramWebApp, isTelegramWebAppAvailable } from './utils/telegramWebApp';
 
 function App() {
   const [started, setStarted] = useState(false);
   const [sliderPosition, setSliderPosition] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isTelegramAvailable, setIsTelegramAvailable] = useState(false);
+  const [progressWidth, setProgressWidth] = useState('0%');
   const sliderRef = useRef(null);
   const trackRef = useRef(null);
 
+  // Инициализация Telegram Web App при загрузке компонента
+  useEffect(() => {
+    const telegramAvailable = isTelegramWebAppAvailable();
+    setIsTelegramAvailable(telegramAvailable);
+    
+    if (telegramAvailable) {
+      initTelegramWebApp();
+      console.log('Telegram WebApp инициализирован');
+    } else {
+      console.log('Приложение запущено в обычном браузере');
+    }
+  }, []);
+
+  // Обновляем ширину индикатора прогресса при изменении позиции слайдера
+  useEffect(() => {
+    if (trackRef.current && sliderRef.current) {
+      const maxX = trackRef.current.clientWidth - sliderRef.current.offsetWidth;
+      const progressPercent = (sliderPosition / maxX) * 100;
+      setProgressWidth(`${progressPercent}%`);
+    }
+  }, [sliderPosition]);
+
+  // Автоматически заполняем слайдер, если пользователь протянул его более чем на 75%
+  useEffect(() => {
+    if (isDragging && trackRef.current && sliderRef.current) {
+      const maxX = trackRef.current.clientWidth - sliderRef.current.offsetWidth;
+      
+      // Если слайдер протянули более чем на 75% пути
+      if (sliderPosition > maxX * 0.75) {
+        // Автоматически заполняем до конца
+        setSliderPosition(maxX);
+        handleStart();
+        setIsDragging(false);
+      }
+    }
+  }, [sliderPosition, isDragging]);
+
+  // Добавляем дополнительный эффект при достижении слайдером цели
+  useEffect(() => {
+    if (sliderPosition > 0 && trackRef.current && sliderRef.current) {
+      const maxX = trackRef.current.clientWidth - sliderRef.current.offsetWidth;
+      
+      // Если слайдер достиг конца
+      if (sliderPosition >= maxX) {
+        // Здесь можно добавить визуальный или звуковой эффект завершения
+        const track = trackRef.current;
+        track.classList.add('completed');
+        
+        setTimeout(() => {
+          track.classList.remove('completed');
+        }, 300);
+      }
+    }
+  }, [sliderPosition]);
+
   const handleStart = () => {
+    if (started) return; // Предотвращаем повторный запуск
+    
     setStarted(true);
     console.log('Приложение запущено!');
-    // Здесь будет код для перехода на следующий экран
+    
+    // Можно отправить данные в Telegram Bot при нажатии кнопки
+    if (isTelegramAvailable && telegram.isExpanded) {
+      // Опционально: отправляем данные в вызывающее приложение/бота
+      // telegram.sendData(JSON.stringify({ action: 'start' }));
+      
+      // Или закрываем приложение после действия
+      // telegram.close();
+    }
   };
 
   const handleTouchStart = (e) => {
+    e.stopPropagation(); // Предотвращаем всплытие к обработчику трека
     setIsDragging(true);
+    setStarted(false);
+    
+    // Добавляем класс dragging для трека при активации ползунка
+    if (trackRef.current) {
+      trackRef.current.classList.add('dragging');
+    }
   };
 
   const handleTouchMove = (e) => {
     if (!isDragging || !sliderRef.current || !trackRef.current) return;
 
+    e.preventDefault(); // Предотвращаем прокрутку страницы
+    
     const track = trackRef.current.getBoundingClientRect();
-    const maxX = track.width - sliderRef.current.offsetWidth;
+    const thumbWidth = sliderRef.current.offsetWidth;
+    const maxX = track.width - thumbWidth;
     
     let clientX;
     if (e.touches && e.touches[0]) {
@@ -35,38 +113,79 @@ function App() {
     let newPosition = Math.max(0, Math.min(trackX, maxX));
     
     setSliderPosition(newPosition);
-    
-    // Если слайдер достиг правого края
-    if (newPosition >= maxX * 0.9) {
-      handleStart();
-      setIsDragging(false);
-    }
   };
 
   const handleTouchEnd = () => {
-    if (isDragging) {
+    if (isDragging && trackRef.current && sliderRef.current) {
       setIsDragging(false);
-      // Если не достигнута правая сторона, возвращаем в исходное положение
-      if (sliderPosition < (trackRef.current.getBoundingClientRect().width - sliderRef.current.offsetWidth) * 0.9) {
+      
+      // Удаляем класс dragging при завершении
+      trackRef.current.classList.remove('dragging');
+      
+      const maxX = trackRef.current.clientWidth - sliderRef.current.offsetWidth;
+      
+      // Если протащили более чем на 60% пути, считаем успешным
+      if (sliderPosition >= maxX * 0.6) {
+        setSliderPosition(maxX);
+        handleStart();
+      } else {
+        // Иначе возвращаем в начальное положение
         setSliderPosition(0);
       }
     }
   };
 
   const handleMouseDown = (e) => {
+    e.stopPropagation(); // Предотвращаем всплытие к обработчику трека
     setIsDragging(true);
+    setStarted(false);
+    
+    // Добавляем класс dragging для трека при активации ползунка
+    if (trackRef.current) {
+      trackRef.current.classList.add('dragging');
+    }
+    
     document.addEventListener('mousemove', handleTouchMove);
     document.addEventListener('mouseup', handleMouseUp);
   };
 
   const handleMouseUp = () => {
-    setIsDragging(false);
+    handleTouchEnd(); // Используем ту же логику, что и для touch событий
     document.removeEventListener('mousemove', handleTouchMove);
     document.removeEventListener('mouseup', handleMouseUp);
+  };
+
+  const handleTrackTouchStart = (e) => {
+    if (!trackRef.current || !sliderRef.current) return;
+
+    // Если пользователь нажал на трек, а не на ползунок,
+    // то перемещаем ползунок в точку нажатия и начинаем перетаскивание
+    const isDirectThumbTouch = e.target === sliderRef.current || sliderRef.current.contains(e.target);
     
-    // Если не достигнута правая сторона, возвращаем в исходное положение
-    if (sliderPosition < (trackRef.current.getBoundingClientRect().width - sliderRef.current.offsetWidth) * 0.9) {
-      setSliderPosition(0);
+    if (!isDirectThumbTouch) {
+      const track = trackRef.current.getBoundingClientRect();
+      const thumbWidth = sliderRef.current.offsetWidth;
+      const maxX = track.width - thumbWidth;
+      
+      let clientX;
+      if (e.touches && e.touches[0]) {
+        clientX = e.touches[0].clientX;
+      } else {
+        clientX = e.clientX;
+      }
+      
+      const trackX = clientX - track.left;
+      let newPosition = Math.max(0, Math.min(trackX, maxX));
+      
+      setSliderPosition(newPosition);
+      setIsDragging(true);
+      setStarted(false);
+      
+      // Если это мышь, добавляем обработчики событий
+      if (!e.touches) {
+        document.addEventListener('mousemove', handleTouchMove);
+        document.addEventListener('mouseup', handleMouseUp);
+      }
     }
   };
 
@@ -86,9 +205,12 @@ function App() {
             <div 
               className="slider-track" 
               ref={trackRef}
+              onTouchStart={handleTrackTouchStart}
+              onMouseDown={handleTrackTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
+              <div className="slider-progress" style={{ width: progressWidth }}></div>
               <div 
                 className={`slider-thumb ${isDragging ? 'dragging' : ''}`}
                 ref={sliderRef}
