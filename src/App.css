@@ -85,11 +85,11 @@
 }
 
 .title {
-  font-size: 48px;
+  font-size: 56px;
   line-height: 1.1;
   font-weight: 700;
   letter-spacing: -0.02em;
-  margin-bottom: 40px;
+  margin-bottom: 50px;
 }
 
 .black-text {
@@ -107,16 +107,16 @@
   width: 100%;
   padding: 0 0;
   margin-top: auto;
-  margin-bottom: 30px;
+  margin-bottom: 50px;
 }
 
 /* Стили для слайдера */
 .slider-track {
   position: relative;
   width: 100%;
-  height: 56px;
+  height: 64px;
   background-color: var(--primary-color);
-  border-radius: 28px;
+  border-radius: 32px;
   margin-bottom: 40px;
   overflow: visible;
   box-shadow: 0 4px 12px rgba(152, 201, 60, 0.3);
@@ -151,8 +151,8 @@
   position: absolute;
   top: 50%;
   left: 0;
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   transform: translateY(-50%);
   background-color: var(--primary-dark);
   border-radius: 50%;
@@ -218,7 +218,7 @@
   align-items: center;
   justify-content: center;
   color: white;
-  font-size: 18px;
+  font-size: 20px;
   font-weight: 600;
   pointer-events: none;
 }
@@ -230,24 +230,24 @@
   }
   
   .title {
-    font-size: 42px;
+    font-size: 48px;
   }
   
   .slider-track {
-    height: 50px;
+    height: 60px;
   }
   
   .slider-thumb {
-    width: 50px;
-    height: 50px;
+    width: 60px;
+    height: 60px;
     transition: none;
   }
   
   .slider-thumb::before {
     content: '';
     position: absolute;
-    width: 70px;
-    height: 70px;
+    width: 80px;
+    height: 80px;
     background-color: transparent;
     border-radius: 50%;
     top: 50%;
@@ -260,7 +260,7 @@
   }
   
   .slider-text {
-    font-size: 16px;
+    font-size: 18px;
   }
   
   /* Удаляем анимацию пульсации на маленьких экранах для повышения производительности */
@@ -273,17 +273,17 @@
 @media (min-width: 768px) {
   .button-container {
     max-width: 500px;
-    margin: auto auto 40px;
+    margin: auto auto 60px;
   }
   
   .title {
-    font-size: 56px;
+    font-size: 64px;
     max-width: 700px;
   }
 }
 
 .arrow-icon {
   color: white;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1;
 }
