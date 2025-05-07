@@ -123,11 +123,11 @@
   cursor: pointer;
   will-change: contents;
   touch-action: none;
-  padding-bottom: 0;
+  padding-left: 64px; /* Отступ для кружка со стрелкой */
   transition: transform 0.2s;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
 }
 
 .slider-track::before {
@@ -196,31 +196,22 @@
   position: absolute;
   right: 25px;
   top: 50%;
-  transform: translateY(-50%); /* Центрируем вертикально */
-  display: flex;
-  align-items: center;
+  transform: translateY(-50%);
   color: white;
-  font-size: 1.2rem;
+  font-size: 20px;
   pointer-events: none;
-  animation: none; /* Убираем анимацию */
-  letter-spacing: -1px;
 }
 
 /* Улучшенный стиль для текста в кнопке */
 .slider-text {
-  position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%); /* Центрируем вертикально */
-  width: 100%;
-  height: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   color: white;
   font-size: 20px;
   font-weight: 600;
+  margin-left: 15px;
+  position: relative;
+  z-index: 1;
   pointer-events: none;
+  white-space: nowrap;
 }
 
 /* Медиа-запросы для адаптивности */
@@ -284,6 +275,8 @@
 
 .arrow-icon {
   color: white;
-  font-size: 24px;
-  line-height: 1;
+  font-size: 28px;
+  font-weight: bold;
+  display: inline-block;
+  margin-right: -5px;
 }

@@ -2,11 +2,15 @@ import { useState, useRef, useEffect } from 'react';
 import './App.css';
 import telegram, { initTelegramWebApp, isTelegramWebAppAvailable } from './utils/telegramWebApp';
 import GenderScreen from './components/GenderScreen';
+import WeightHeightScreen from './components/WeightHeightScreen';
+import GoalsScreen from './components/GoalsScreen';
 
 // Экраны приложения
 const SCREENS = {
   START: 'start',
-  GENDER: 'gender'
+  GENDER: 'gender',
+  WEIGHT_HEIGHT: 'weight_height',
+  GOALS: 'goals'
 };
 
 function App() {
@@ -15,7 +19,10 @@ function App() {
   
   // Состояние для данных профиля пользователя
   const [userProfile, setUserProfile] = useState({
-    gender: null
+    gender: null,
+    weight: 65,
+    height: 178,
+    goal: null
   });
 
   // Состояния для слайдера
@@ -107,8 +114,42 @@ function App() {
       ...prev,
       gender
     }));
-    // Здесь будет переход к следующему экрану
     console.log(`Выбран пол: ${gender}`);
+    
+    // Переходим к экрану веса и роста
+    setCurrentScreen(SCREENS.WEIGHT_HEIGHT);
+  };
+
+  // Обработчик для экрана веса и роста
+  const handleWeightHeightSelect = ({ weight, height }) => {
+    setUserProfile(prev => ({
+      ...prev,
+      weight,
+      height
+    }));
+    console.log(`Выбран вес: ${weight} кг, рост: ${height} см`);
+    
+    // Переходим к экрану выбора цели
+    setCurrentScreen(SCREENS.GOALS);
+  };
+
+  // Обработчик для экрана выбора цели
+  const handleGoalSelect = (goal) => {
+    setUserProfile(prev => ({
+      ...prev,
+      goal
+    }));
+    console.log(`Выбрана цель: ${goal}`);
+    
+    // Здесь будет переход к следующему экрану или отправка данных в бота
+    // Пока просто отправим данные в консоль
+    console.log('Сформированный профиль пользователя:', userProfile);
+
+    // Возможно, здесь будет переход к дополнительным экранам или отправка данных
+    // Временно вернемся на стартовый экран для демонстрации
+    setCurrentScreen(SCREENS.START);
+    setStarted(false);
+    setSliderPosition(0);
   };
 
   const handleTouchStart = (e) => {
@@ -261,6 +302,12 @@ function App() {
       
       case SCREENS.GENDER:
         return <GenderScreen onNext={handleGenderSelect} />;
+      
+      case SCREENS.WEIGHT_HEIGHT:
+        return <WeightHeightScreen onNext={handleWeightHeightSelect} />;
+      
+      case SCREENS.GOALS:
+        return <GoalsScreen onNext={handleGoalSelect} />;
       
       default:
         return <div>Неизвестный экран</div>;
