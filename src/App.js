@@ -266,12 +266,12 @@ function App() {
         return (
           <div className="start-screen">
             <div className="content">
-            <h1 className="title">
+            <div className="title">
               <span className="black-text">Построй</span>
               <span className="green-text">правильное</span>
               <span className="black-text">питание</span>
-            </h1>
-              <div className="button-container">
+            </div>
+            <div className="button-container">
                 <div 
                   className="slider-track" 
                   ref={trackRef}

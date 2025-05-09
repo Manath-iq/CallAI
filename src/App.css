@@ -90,34 +90,41 @@
 .content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
+  justify-content: center; /* Центр по вертикали */
+  align-items: center;     /* Центр по горизонтали */
   height: 100%;
   position: relative;
   z-index: 1;
-  padding: 38vh 5vw 5vh 7vw; /* Increased top padding to 38vh, adjusted left to 7vw */
+  padding: 0 5vw;
+}
+
+@media (max-width: 480px) {
+  .content {
+    padding: 0 4vw;
+  }
 }
 
 .title {
-  font-size: 16vh; /* Adjusted font size to 16vh */
-  line-height: 0.8; /* Kept line height */
-  font-weight: 900; /* Увеличена жирность для соответствия дизайну */
-  letter-spacing: -0.05em; /* Максимальное сжатие букв */
-  margin-bottom: 0; /* Keep margin-bottom at 0 */
-  text-align: left;
-  max-width: 85%; /* Adjusted max-width to allow more text per line */
-  /* margin-left: 0; Removed, padding handled by .content */
+  font-size: clamp(32px, 10vw, 80px); /* Адаптивный размер */
+  line-height: 1.1;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+  margin-bottom: 0;
+  text-align: center;
+  max-width: 90%;
+  display: block;
 }
 
 .black-text {
   color: #000000; /* Явно задаем черный цвет */
   font-weight: 900; /* Увеличена жирность для соответствия дизайну */
+  display: none; /* Скрыть текст */
 }
 
 .green-text {
   color: var(--target-green-text-color, #90EE90); /* Новый светло-зеленый */
   font-weight: 900; /* Увеличена жирность для соответствия дизайну */
-  display: inline-block;
+  display: none; /* Скрыть текст */
 }
 
 /* Force line breaks for text parts within the title to match design */
