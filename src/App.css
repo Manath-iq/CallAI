@@ -2,9 +2,15 @@
   --primary-color: #98c93c;
   --secondary-color: #fffcd9;
   --primary-dark: #6ea32c;
-  --background-color: #fffcd9;
+  --background-color: #fffcd9; /* Можно изменить на #FFFFFF, если весь фон приложения должен быть белым */
   --text-color: #000000;
   --font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+  /* Новые цвета для целевого дизайна (можно настроить точнее) */
+  --target-green-text-color: #8BC34A; /* Более насыщенный зеленый для текста */
+  --target-button-bg-color: #F1F8E9; /* Очень светлый, почти белый зеленый фон кнопки */
+  --target-button-thumb-color: #7CB342; /* Яркий, но более темный зеленый для кружка */
+  --target-slider-arrows-color: #689F38; /* Более темный зеленый для стрелок для контраста */
+  --target-slider-text-color: #2E7D32; /* Темно-зеленый для текста кнопки для лучшего контраста */
 }
 
 /* Переопределение цветов для темной темы */
@@ -29,7 +35,7 @@
   width: 100%;
   height: 100vh;
   position: relative;
-  overflow: hidden;
+  overflow: visible; /* временно для диагностики */
   background-color: var(--background-color);
   color: var(--text-color);
 }
@@ -43,11 +49,16 @@
   left: 0;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: 80px 25px 40px;
+  justify-content: flex-start; /* Контент сверху, чтобы лучше сочетаться с фоном */
+  padding: 0; /* Убраны отступы, управляются в .content */
   animation: fadeIn 0.3s ease-in-out forwards;
-  background: linear-gradient(150deg, var(--secondary-color) 0%, #e9f0c0 100%);
-  overflow: hidden;
+  background-color: #FFFFFF; /* Белый фон */
+  /* Фоновый рисунок (swoosh) */
+  background-image: url(/public/swoosh-background.svg); /* Путь к файлу swoosh в папке public */
+  background-repeat: no-repeat;
+  background-position: top right; /* Позиционирование swoosh вверху справа */
+  background-size: contain; /* Изменено для предотвращения выхода за пределы */
+  overflow: visible; /* временно для диагностики */
 }
 
 .start-screen::before {
@@ -57,10 +68,12 @@
   left: -10%;
   width: 120%;
   height: 100%;
-  background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2398c93c" fill-opacity="0.2" d="M0,224L80,224C160,224,320,224,480,197.3C640,171,800,117,960,117.3C1120,117,1280,171,1360,197.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>') no-repeat bottom center;
-  background-size: cover;
-  z-index: 0;
-  opacity: 0.7;
+  /* Удаляем старый фон-волну или делаем его прозрачным */
+  background: none; /* Убираем старый SVG фон */
+  /* background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="%2398c93c" fill-opacity="0.2" d="M0,224L80,224C160,224,320,224,480,197.3C640,171,800,117,960,117.3C1120,117,1280,171,1360,197.3L1440,224L1440,320L1360,320C1280,320,1120,320,960,320C800,320,640,320,480,320C320,320,160,320,80,320L0,320Z"></path></svg>') no-repeat bottom center; */
+  /* background-size: cover; */
+  z-index: 0; /* Можно понизить или убрать, если swoosh будет на z-index: 1 в .start-screen */
+  opacity: 0; /* Скрываем старую волну */
 }
 
 @keyframes fadeIn {
@@ -77,37 +90,47 @@
 .content {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  justify-content: flex-start;
+  align-items: flex-start;
   height: 100%;
   position: relative;
   z-index: 1;
-  padding-top: 10vh;
+  padding: 38vh 5vw 5vh 7vw; /* Increased top padding to 38vh, adjusted left to 7vw */
 }
 
 .title {
-  font-size: 56px;
-  line-height: 1.1;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  margin-bottom: 50px;
+  font-size: 16vh; /* Adjusted font size to 16vh */
+  line-height: 0.8; /* Kept line height */
+  font-weight: 900; /* Увеличена жирность для соответствия дизайну */
+  letter-spacing: -0.05em; /* Максимальное сжатие букв */
+  margin-bottom: 0; /* Keep margin-bottom at 0 */
+  text-align: left;
+  max-width: 85%; /* Adjusted max-width to allow more text per line */
+  /* margin-left: 0; Removed, padding handled by .content */
 }
 
 .black-text {
-  color: var(--text-color);
-  font-weight: bold;
+  color: #000000; /* Явно задаем черный цвет */
+  font-weight: 900; /* Увеличена жирность для соответствия дизайну */
 }
 
 .green-text {
-  color: var(--primary-color);
-  font-weight: 600;
+  color: var(--target-green-text-color, #90EE90); /* Новый светло-зеленый */
+  font-weight: 900; /* Увеличена жирность для соответствия дизайну */
   display: inline-block;
+}
+
+/* Force line breaks for text parts within the title to match design */
+.title .black-text,
+.title .green-text {
+  display: block;
 }
 
 .button-container {
   width: 100%;
   padding: 0 0;
-  margin-top: auto;
-  margin-bottom: 50px;
+  margin-top: auto; /* Оставляет кнопку прижатой к низу .content */
+  margin-bottom: 20px; /* Скорректирован отступ снизу для лучшего расположения */
 }
 
 /* Стили для слайдера */
@@ -115,11 +138,11 @@
   position: relative;
   width: 100%;
   height: 64px;
-  background-color: var(--primary-color);
+  background-color: var(--target-button-bg-color, #E6F5E4); /* Новый фон кнопки */
   border-radius: 32px;
-  margin-bottom: 40px;
+  margin-bottom: 0; /* Убран лишний отступ, управляется button-container */
   overflow: visible;
-  box-shadow: 0 4px 12px rgba(152, 201, 60, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1); /* Более мягкая тень */
   cursor: pointer;
   will-change: contents;
   touch-action: none;
@@ -154,7 +177,7 @@
   width: 64px;
   height: 64px;
   transform: translateY(-50%);
-  background-color: var(--primary-dark);
+  background-color: var(--target-button-thumb-color, #6EBF70); /* Новый фон для кружка */
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -168,12 +191,12 @@
 
 .slider-thumb:active {
   cursor: grabbing;
-  background-color: #5c8c24;
+  background-color: #5aae5d; /* Немного темнее --target-button-thumb-color при нажатии */
 }
 
 .slider-thumb.dragging {
-  box-shadow: 0 0 12px 3px rgba(255, 255, 255, 0.6);
-  background-color: #5c8c24;
+  box-shadow: 0 0 12px 3px rgba(var(--target-button-thumb-color, #6EBF70), 0.5); /* Тень в цвет кружка */
+  background-color: #5aae5d; /* Немного темнее --target-button-thumb-color при перетаскивании */
 }
 
 /* Когда пользователь начинает перетаскивание, показываем подсказку */
@@ -194,70 +217,41 @@
 /* Упрощенный стиль для стрелок в кнопке */
 .slider-arrows {
   position: absolute;
-  right: 25px;
+  right: 20px;
   top: 50%;
   transform: translateY(-50%);
-  color: white;
   font-size: 20px;
+  font-weight: bold;
+  color: var(--target-slider-arrows-color, #A2D4A2); /* Новый цвет для ">>>" */
   pointer-events: none;
+  opacity: 0.7;
 }
 
 /* Улучшенный стиль для текста в кнопке */
 .slider-text {
-  color: white;
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 600;
-  margin-left: 15px;
-  position: relative;
-  z-index: 1;
+  color: var(--target-slider-text-color, #333333); /* Новый цвет текста кнопки */
+  position: absolute;
+  left: 75px; /* Отступ от левого края для текста, после кружка */
+  top: 50%;
+  transform: translateY(-50%);
   pointer-events: none;
   white-space: nowrap;
+  transition: opacity 0.2s;
 }
 
 /* Медиа-запросы для адаптивности */
 @media (max-width: 480px) {
   .content {
-    padding-top: 15vh;
+    padding: 35vh 4vw 5vh 6vw; /* Adjusted top and left padding for mobile */
   }
-  
   .title {
-    font-size: 48px;
-  }
-  
-  .slider-track {
-    height: 60px;
-  }
-  
-  .slider-thumb {
-    width: 60px;
-    height: 60px;
-    transition: none;
-  }
-  
-  .slider-thumb::before {
-    content: '';
-    position: absolute;
-    width: 80px;
-    height: 80px;
-    background-color: transparent;
-    border-radius: 50%;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
-  
-  .slider-progress {
-    transition: none;
-  }
-  
-  .slider-text {
-    font-size: 18px;
-  }
-  
-  /* Удаляем анимацию пульсации на маленьких экранах для повышения производительности */
-  .slider-track:not(:active):not(.dragging)::after {
-    animation: none;
-    opacity: 0.3;
+    font-size: 16vh; /* Consistent with new base */
+    line-height: 0.8; /* Consistent with new base */
+    letter-spacing: -0.05em; /* Explicitly keep */
+    margin-bottom: 0; /* Consistent with new base */
+    max-width: 88%; /* Adjusted max-width for mobile */
   }
 }
 
@@ -266,17 +260,12 @@
     max-width: 500px;
     margin: auto auto 60px;
   }
-  
-  .title {
-    font-size: 64px;
-    max-width: 700px;
-  }
 }
 
 .arrow-icon {
-  color: white;
+  color: white; /* Оставляем стрелку белой */
   font-size: 28px;
   font-weight: bold;
   display: inline-block;
-  margin-right: -5px;
+  margin-right: -5px; /* Можно убрать или настроить, если стрелка смещается */
 }
